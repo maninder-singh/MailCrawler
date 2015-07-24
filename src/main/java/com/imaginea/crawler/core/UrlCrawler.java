@@ -9,6 +9,8 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 import org.apache.log4j.Logger;
 import org.joda.time.DateTime;
@@ -24,10 +26,24 @@ public class UrlCrawler {
 		
 		List<String> urlStringList = this.getUrlsForYear(Constant.URL,dateTime);
 		this.createDirectory();
-		for (String urlString : urlStringList) {
-			this.saveFile(urlString);
-		}
 		
+		ExecutorService executor = Executors.newFixedThreadPool(urlStringList.size());
+		
+		for (final String saveFileName : urlStringList) {
+			Thread thread = new Thread(new Runnable() {
+				
+				public void run() {
+					UrlCrawler crawler = new UrlCrawler();
+					crawler.saveFile(saveFileName);
+					logger.info("Thread " + saveFileName + " complete");	
+				}
+			},"Thread " + saveFileName);		
+			executor.execute(thread);
+		}
+		executor.shutdown();		
+		while(!executor.isTerminated()){
+			
+		}		
 		logger.info("Download file location : " + Constant.FILE_LOCATION);
 		logger.info(urlStringList.size() +" files are downloaded");
 	}

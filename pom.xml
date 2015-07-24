@@ -17,11 +17,6 @@
       <scope>test</scope>
     </dependency>
     
-    <dependency>
-		<groupId>javax.mail</groupId>
-		<artifactId>mail</artifactId>
-		<version>1.5.0-b01</version>
-	</dependency>
 	
 	<dependency>
 	  <groupId>joda-time</groupId>
@@ -29,11 +24,6 @@
 	  <version>2.8.1</version>
 	</dependency>
     
-    <dependency>
-		<groupId>org.apache.commons</groupId>
-		<artifactId>commons-email</artifactId>
-		<version>1.4</version>
-	</dependency>
 
 	<dependency>
 		<groupId>log4j</groupId>

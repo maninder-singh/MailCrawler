@@ -7,7 +7,7 @@
   <version>0.0.1-SNAPSHOT</version>
   <packaging>jar</packaging>
 
-  <name>MailCrawler</name>
+  <name>Crawler</name>
 
   <dependencies>
     <dependency>
@@ -34,7 +34,7 @@
   </dependencies>
   
   <build>
-		<finalName>MailCrawler</finalName>
+		<finalName>Crawler</finalName>
 		<resources>
 			<resource>
 				<directory>src/main/java</directory>

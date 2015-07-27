@@ -31,7 +31,7 @@ public class StartUp {
 		}
 		
 		logger.info("Download Files for year : " + dateTime.getYear());
-		UrlCrawler urlCrawler = new UrlCrawler();
-		urlCrawler.crawl(dateTime);
+		Crawler crawler = new Crawler();
+		crawler.crawl(dateTime);
 	}
 }

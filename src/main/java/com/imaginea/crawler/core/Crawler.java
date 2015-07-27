@@ -17,9 +17,9 @@ import org.joda.time.DateTime;
 
 import com.imaginea.crawler.constant.Constant;
 
-public class UrlCrawler {
+public class Crawler {
 	
-	final static Logger logger = Logger.getLogger(UrlCrawler.class);
+	final static Logger logger = Logger.getLogger(Crawler.class);
 	
 	public void crawl(DateTime dateTime){
 		
@@ -33,7 +33,7 @@ public class UrlCrawler {
 			Thread thread = new Thread(new Runnable() {
 				
 				public void run() {
-					UrlCrawler crawler = new UrlCrawler();
+					Crawler crawler = new Crawler();
 					crawler.saveFile(saveFileName);
 					logger.info("Thread " + saveFileName + " complete");	
 				}

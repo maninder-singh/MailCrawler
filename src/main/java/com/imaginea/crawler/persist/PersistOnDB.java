@@ -3,6 +3,8 @@ package com.imaginea.crawler.persist;
 import java.io.InputStream;
 import java.util.Properties;
 
+import com.imaginea.crawler.pojo.Mail;
+
 public class PersistOnDB implements IPersist{
 
 	private Properties props;
@@ -11,12 +13,12 @@ public class PersistOnDB implements IPersist{
 		this.props = props;
 	}
 	
-	public void configuration() {
+	public void initialize() {
 		// TODO Auto-generated method stub
 		
 	}
 
-	public void save(InputStream inputStream) {
+	public void save(Mail mail) {
 		// TODO Auto-generated method stub
 		
 	}

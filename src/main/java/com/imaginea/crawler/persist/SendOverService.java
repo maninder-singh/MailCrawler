@@ -3,6 +3,8 @@ package com.imaginea.crawler.persist;
 import java.io.InputStream;
 import java.util.Properties;
 
+import com.imaginea.crawler.pojo.Mail;
+
 public class SendOverService implements IPersist{
 
 	private Properties props;
@@ -11,11 +13,11 @@ public class SendOverService implements IPersist{
 		this.props = props;
 	}
 	
-	public void configuration() {
+	public void initialize() {
 		
 	}
 
-	public void save(InputStream inputStream) {
+	public void save(Mail mail) {
 		
 	}
 

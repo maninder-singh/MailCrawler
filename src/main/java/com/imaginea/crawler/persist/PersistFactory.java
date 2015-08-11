@@ -9,14 +9,11 @@ import com.imaginea.crawler.util.PropertiesUtil;
 public class PersistFactory {
 	
 	private IPersist persist;
+	private Properties props;
 	private static final String PERSIST_TYPE = "persist-type";
-	
-	public IPersist getPersist() {
-		return persist;
-	}
 
-	public void setPersist(IPersist persist) {
-		this.persist = persist;
+	public IPersist getPersist(){
+		return persist;
 	}
 	
 	public IPersist getPersistObject() throws IOException{
@@ -41,7 +38,7 @@ public class PersistFactory {
 		}else{
 		}
 		
-		persist.configuration();
+		persist.initialize();
 		return persist;
 	}
 

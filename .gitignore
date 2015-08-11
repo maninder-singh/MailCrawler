@@ -1,0 +1,8 @@
+#files to ignore
+*.log
+target/*
+.idea/*
+*.iml
+log_with_double_foward~
+*.log~
+

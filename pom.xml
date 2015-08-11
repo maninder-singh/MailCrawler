@@ -41,7 +41,7 @@
   
   <build>
 		<finalName>Crawler</finalName>
-		<resources>
+		<!-- <resources>
 			<resource>
 				<directory>src/main/java</directory>
 				<includes>
@@ -49,7 +49,7 @@
 					<include>persist.properties</include>
 				</includes>
 			</resource>
-		</resources>
+		</resources> -->
 		<plugins>
  
 			<!-- download source code in Eclipse, best practice -->

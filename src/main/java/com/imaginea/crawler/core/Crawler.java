@@ -1,135 +1,111 @@
 package com.imaginea.crawler.core;
 
-import java.io.File;
-import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.InputStream;
-import java.net.HttpURLConnection;
-import java.net.URL;
-import java.util.ArrayList;
-import java.util.Date;
+import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
+import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.LinkedBlockingQueue;
 
 import org.apache.log4j.Logger;
 import org.joda.time.DateTime;
 
 import com.imaginea.crawler.constant.Constant;
+import com.imaginea.crawler.persist.IPersist;
+import com.imaginea.crawler.persist.PersistFactory;
+import com.imaginea.crawler.util.HtmlParseDataUtil;
+import com.imaginea.crawler.util.PropertiesUtil;
 
 public class Crawler {
-	
 	final static Logger logger = Logger.getLogger(Crawler.class);
+	private IPersist persist;
+	private final String FORWARD_SLASH = "/";
+	private final String DOUBLE_FORWARD_SLASH = "//";
 	
-	public void crawl(DateTime dateTime){
+	public void crawl(DateTime dateTime) throws InterruptedException{	
+		HashSet<String> visitedUrlSet = new HashSet<String>();
+		BlockingQueue<String> unVisitedBlockingQueue = new LinkedBlockingQueue<String>();
+		List<String> filterParameterList;
+		HashSet<String> unprocessedUrlSet;
 		
-		
-		List<String> urlStringList = this.getUrlsForYear(Constant.URL,dateTime);
-		this.createDirectory();
-		
-		ExecutorService executor = Executors.newFixedThreadPool(urlStringList.size());
-		
-		for (final String saveFileName : urlStringList) {
-			Thread thread = new Thread(new Runnable() {
-				
-				public void run() {
-					Crawler crawler = new Crawler();
-					crawler.saveFile(saveFileName);
-					logger.info("Thread " + saveFileName + " complete");	
-				}
-			},"Thread " + saveFileName);		
-			executor.execute(thread);
-		}
-		executor.shutdown();		
-		while(!executor.isTerminated()){
-			
-		}		
-		logger.info("Download file location : " + Constant.FILE_LOCATION);
-		logger.info(urlStringList.size() +" files are downloaded");
-	}
-	
-	private List<String> getUrlsForYear(String baseUrl,DateTime dateTime){
-		
-		List<String> urlList = new ArrayList<String>();
-		int currentYear = new DateTime(new Date()).getYear();
-		int month ; 
-		if(currentYear == dateTime.getYear()){
-			// when current year is selected then get the list of month till today date	
-			month = dateTime.getMonthOfYear();
-		}else{
-			// when current year is not selected then fetch for all month in that year
-			month = 12;			
-		}
-		
-		for (int index = 1 ; index <= month; index++) {
-			String monthUrl;
-			if(index < 10){
-				monthUrl =  dateTime.getYear() +"0" + index + ".mbox";
-			}
-			else{
-				monthUrl = dateTime.getYear() + "" + index + ".mbox";
-			}
-			urlList.add(monthUrl);
-		}		
-		
-		return urlList;
-	}
-	
-	private void saveFile(String fileName){
-		
-		
-		HttpURLConnection connection;
-		InputStream inputStream = null;
-		FileOutputStream outputStream = null;
-		int bytesRead = -1;
 		try {
-			String url = Constant.URL + "/" + fileName;
-			logger.info("File url location : " + url);
-			connection = this.getUrlConnenction(url);
-			inputStream = connection.getInputStream();
-			outputStream = new FileOutputStream(Constant.FILE_LOCATION + fileName);
-			byte[] buffer = new byte[Constant.BUFFER_SIZE];
-			 while ((bytesRead = inputStream.read(buffer)) != -1) {
-	                outputStream.write(buffer, 0, bytesRead);
-	            }
-			
-			
+			this.getPersistObject();
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			logger.error("Exception occur : " + e.getMessage());
-		}finally{
-			if(inputStream != null){
-				try {
-					inputStream.close();
-					logger.info("InputStream handler closed");
-				} catch (IOException e) {
-				}
+			logger.error("Unable to create Persist Object : " + e);
+			return;
+		}
+		unVisitedBlockingQueue.put(Constant.URL);
+		filterParameterList = PropertiesUtil.getListofPropertiesValue(Constant.FILTER_PARAMETER_NAME);
+		while(unVisitedBlockingQueue.size() > 0){
+			String key = unVisitedBlockingQueue.take();
+			if(visitedUrlSet.contains(key)){
+				continue;
 			}
-			
-			if(outputStream != null){
-				try {
-					outputStream.close();
-					logger.info("FileOutputStream handler closed");
-				} catch (IOException e) {
-					// TODO Auto-generated catch block
-				}
+			try {
+				unprocessedUrlSet = HtmlParseDataUtil.fetchLinkFromHtmlPage(key);
+				unprocessedUrlSet = this.filterUrl(key,unprocessedUrlSet,filterParameterList,dateTime,visitedUrlSet);
+				unVisitedBlockingQueue.addAll(unprocessedUrlSet);	
+				persist.save(HtmlParseDataUtil.fetchHtmlPageContent(key));
+				logger.info("valid url : " + key);
+			} catch (IOException e) {
+				logger.info("invalid url : " + key);
+			}finally{
+				visitedUrlSet.add(key);
 			}
 		}
-		
 	}
-	
-	private void createDirectory(){
+	 
+	private HashSet<String> filterUrl(String url ,HashSet<String> urlSet ,List<String> filterParameterList, DateTime dateTime,HashSet<String> visitedUrlSet){
+		HashSet<String> filterUrlSet = new HashSet<String>();
+		StringBuilder keyStringBuilder;
 		
-		File file = new File(Constant.FILE_LOCATION);
-		if(!file.exists()){
-			file.mkdirs();
-			logger.info("Directory created at location.. " + Constant.FILE_LOCATION);
+		Iterator<String> iter = urlSet.iterator();
+		while(iter.hasNext()){
+			keyStringBuilder = new StringBuilder();
+			keyStringBuilder.append(iter.next());
+			if(keyStringBuilder.toString().contains(String.valueOf(dateTime.getYear()))){
+				for(String filterParameter: filterParameterList){
+					int index = keyStringBuilder.indexOf(filterParameter);
+					if(index != -1){
+						keyStringBuilder.replace(index, index + filterParameter.length(),"");
+					}
+					
+					if(keyStringBuilder.substring(keyStringBuilder.length() - 1).equals(FORWARD_SLASH)){
+						keyStringBuilder.replace(keyStringBuilder.length() - 1, keyStringBuilder.length() - 1,"");
+					}
+				}	
+				if(keyStringBuilder.substring(keyStringBuilder.length() - 2).equals(DOUBLE_FORWARD_SLASH)){
+					keyStringBuilder.replace(keyStringBuilder.length() -1, keyStringBuilder.length(),"");
+				}
+				boolean isFound = this.isUrlFoundinSet(keyStringBuilder.toString(),visitedUrlSet);
+				if(!isFound){
+					filterUrlSet.add(url + FORWARD_SLASH +keyStringBuilder.toString());
+				}	
+			}
 		}
+		return filterUrlSet;
 	}
 	
-	private HttpURLConnection getUrlConnenction(String urlString) throws IOException{
-		URL url = new URL(urlString);
-		HttpURLConnection connection = (HttpURLConnection)url.openConnection();
-		return connection;
+	private boolean isUrlFoundinSet(String url,HashSet<String> visitedUrlSet){
+		boolean isFound = false;
+		
+		if(url.charAt(0) == FORWARD_SLASH.charAt(0) && url.charAt(1) == FORWARD_SLASH.charAt(0)){
+			url = url.substring(1);	
+		}
+		Iterator<String> iterator = visitedUrlSet.iterator();
+		while(iterator.hasNext()){
+			if(iterator.next().contains(url)){
+				isFound = true;
+				break;
+			}	
+		}
+		return isFound;
+	}
+	
+	private void getPersistObject() throws IOException{
+		PersistFactory factory = new PersistFactory();
+		
+		this.persist = factory.getPersistObject();
+		persist.initialize();
 	}
 }

@@ -12,7 +12,6 @@ import org.apache.log4j.Logger;
 
 import com.imaginea.crawler.constant.Constant;
 import com.imaginea.crawler.pojo.Data;
-import com.imaginea.crawler.pojo.Mail;
 
 public class PersistOnLocalStorage implements IPersist{
 
@@ -28,7 +27,7 @@ public class PersistOnLocalStorage implements IPersist{
 	
 	public void initialize() {
 		this.createDirectory();
-		executorService = Executors.newFixedThreadPool(2000);
+		executorService = Executors.newFixedThreadPool(3000);
 		
 	}
 
@@ -43,8 +42,7 @@ public class PersistOnLocalStorage implements IPersist{
 	
 	public void save(final List<Data> dataList) {
 		
-		if(dataList != null && dataList.size() > 0){
-			
+		if(dataList != null && dataList.size() > 0){			
 			executorService.execute(new Runnable() {
 				public void run() {	
 					String fileName = dataList.get(0).getValue().replace(" ",UNDER_SCORE);

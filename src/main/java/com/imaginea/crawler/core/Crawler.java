@@ -24,7 +24,7 @@ public class Crawler{
 	
 	private IPersist persist;
 	
-	public void crawl(DateTime dateTime) throws InterruptedException{
+	public void crawl(DateTime dateTime,String url) throws InterruptedException{
 		
 		HashSet<String> visitedUrlSet = new HashSet<String>();
 		BlockingQueue<String> unVisitedBlockingQueue = new LinkedBlockingQueue<String>();
@@ -39,7 +39,7 @@ public class Crawler{
 			logger.error("Unable to create Persist Object : " + e);
 			return;
 		}
-		unVisitedBlockingQueue.put(Constant.URL);
+		unVisitedBlockingQueue.put(url);
 		filterParameterList = PropertiesUtil.getListofPropertiesValue(Constant.FILTER_PARAMETER_NAME);
 		pattern = RegexUtil.createPattern(filterParameterList);
 		while(unVisitedBlockingQueue.size() > 0){

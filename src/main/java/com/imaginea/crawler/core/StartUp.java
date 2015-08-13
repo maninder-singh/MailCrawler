@@ -2,6 +2,7 @@ package com.imaginea.crawler.core;
 
 import java.io.IOException;
 import java.util.Date;
+import java.util.Timer;
 
 import org.apache.log4j.Logger;
 import org.joda.time.DateTime;
@@ -30,6 +31,7 @@ public class StartUp {
 		}
 		try {
 			PropertiesUtil.readPropertyFile(Constant.CONFIG_FILE_NAME);
+			logger.info("crawl for year : " + dateTime.getYear());
 			crawler.crawl(dateTime);
 		}
 		catch (InterruptedException e) {

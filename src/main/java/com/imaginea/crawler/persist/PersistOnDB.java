@@ -1,9 +1,9 @@
 package com.imaginea.crawler.persist;
 
-import java.io.InputStream;
+import java.util.List;
 import java.util.Properties;
 
-import com.imaginea.crawler.pojo.Mail;
+import com.imaginea.crawler.pojo.Data;
 
 public class PersistOnDB implements IPersist{
 
@@ -14,13 +14,14 @@ public class PersistOnDB implements IPersist{
 	}
 	
 	public void initialize() {
-		// TODO Auto-generated method stub
 		
 	}
 
-	public void save(Mail mail) {
-		// TODO Auto-generated method stub
+	public void save(List<Data> dataList) {
 		
 	}
-
+	
+	public void cleanUp(){
+		
+	}
 }

@@ -1,8 +1,9 @@
 package com.imaginea.crawler.persist;
 
-import java.io.InputStream;
+import java.util.List;
 import java.util.Properties;
 
+import com.imaginea.crawler.pojo.Data;
 import com.imaginea.crawler.pojo.Mail;
 
 public class SendOverService implements IPersist{
@@ -17,9 +18,12 @@ public class SendOverService implements IPersist{
 		
 	}
 
-	public void save(Mail mail) {
+	public void save(List<Data> dataList) {
 		
 	}
 
+	public void cleanUp(){
+		
+	}
 	
 }

@@ -1,13 +1,14 @@
 package com.imaginea.crawler.persist;
 
-import java.io.FileNotFoundException;
-import java.io.InputStream;
+import java.util.List;
 
-import com.imaginea.crawler.pojo.Mail;
+import com.imaginea.crawler.pojo.Data;
 
 public interface IPersist {
 
 	public void initialize();
 	
-	public void save(Mail mail) throws FileNotFoundException;
+	public void save(List<Data> dataList);
+	
+	public void cleanUp();
 }

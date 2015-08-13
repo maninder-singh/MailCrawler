@@ -10,7 +10,7 @@ public class PersistFactory {
 	
 	private IPersist persist;
 	private Properties props;
-	private static final String PERSIST_TYPE = "persist-type";
+	private final String PERSIST_TYPE = "persist-type";
 
 	public IPersist getPersist(){
 		return persist;
@@ -18,17 +18,18 @@ public class PersistFactory {
 	
 	public IPersist getPersistObject() throws IOException{
 		
-		PropertiesUtil.readPropertyFile(Constant.PERSIST_FILE_NAME);
-		Properties props = PropertiesUtil.getProperties();
 		String persistType;
-		if(props.containsKey(PERSIST_TYPE))
-		{
+		if(props == null){
+			PropertiesUtil.readPropertyFile(Constant.PERSIST_FILE_NAME);
+			props = PropertiesUtil.getProperties();
+		}
+		
+		if(props.containsKey(PERSIST_TYPE))	{
 			persistType = props.getProperty(PERSIST_TYPE);
 		}else{
 			persistType = "";
 		}
 		
-
 		if(persistType.equals(Constant.SAVE_ON_LOCAL_STORAGE)){
 			persist = new PersistOnLocalStorage(props);
 		}else if(persistType.equals(Constant.SAVE_ON_DATABASE)){
@@ -36,6 +37,7 @@ public class PersistFactory {
 		}else if(persistType.equals(Constant.SEND_OVER_SERVICE)){
 			persist = new SendOverService(props);
 		}else{
+			return null;
 		}
 		
 		persist.initialize();

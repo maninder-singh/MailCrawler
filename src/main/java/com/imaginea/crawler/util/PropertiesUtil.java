@@ -3,7 +3,6 @@ package com.imaginea.crawler.util;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.ObjectInputStream.GetField;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
@@ -38,7 +37,6 @@ public class PropertiesUtil {
 				propertiesValueList.add(value);
 			}
 		}
-		
 		return propertiesValueList;
 	}
 }
